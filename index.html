@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КОСМОМУСОР — Угроза из орбиты</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --space: #020408;
+    --deep: #050d1a;
+    --blue: #0a4dcc;
+    --cyan: #00d4ff;
+    --red: #ff3c3c;
+    --amber: #ffa520;
+    --white: #e8f4ff;
+    --muted: #5a7a9a;
+    --card-bg: rgba(10,20,40,0.7);
+    --border: rgba(0,212,255,0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--space);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(2,4,8,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900; font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    color: var(--cyan);
+  }
+
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem; letter-spacing: 0.1em;
+    color: var(--muted); text-decoration: none;
+    transition: color 0.2s;
+    text-transform: uppercase;
+  }
+  .nav-links a:hover { color: var(--cyan); }
+
+  .nav-alert {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem; color: var(--red);
+    border: 1px solid var(--red);
+    padding: 0.3rem 0.8rem;
+    letter-spacing: 0.1em;
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── HERO ── */
+  #hero {
+    position: relative; height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  #globe-canvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+  }
+
+  .hero-content {
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .hero-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.25em;
+    color: var(--cyan); text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    border: 1px solid rgba(0,212,255,0.3);
+    padding: 0.3rem 1rem;
+  }
+
+  .hero-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title .line1 { color: var(--white); display: block; }
+  .hero-title .line2 {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--cyan);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem; font-weight: 300;
+    color: rgba(232,244,255,0.6);
+    max-width: 480px; margin: 0 auto 2.5rem;
+    line-height: 1.6;
+  }
+
+  .hero-stats {
+    display: flex; gap: 3rem; justify-content: center;
+    margin-bottom: 3rem;
+  }
+
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem; font-weight: 700;
+    color: var(--cyan);
+    display: block;
+  }
+  .stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+
+  .scroll-hint {
+    position: absolute; bottom: 2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem; color: var(--muted);
+    letter-spacing: 0.15em;
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    animation: float 3s ease-in-out infinite;
+  }
+  .scroll-arrow { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--cyan), transparent); }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 6rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.25em;
+    color: var(--cyan); text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .section-tag::before {
+    content: '';
+    display: inline-block; width: 2rem; height: 1px;
+    background: var(--cyan);
+  }
+
+  h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+
+  .lead {
+    font-size: 1.1rem; font-weight: 300;
+    color: rgba(232,244,255,0.65);
+    max-width: 640px;
+    line-height: 1.75;
+    margin-bottom: 3rem;
+  }
+
+  /* ── PROBLEM GRID ── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .prob-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .prob-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--cyan), transparent);
+  }
+  .prob-card:hover {
+    border-color: rgba(0,212,255,0.4);
+    transform: translateY(-4px);
+  }
+
+  .prob-icon {
+    font-size: 2.5rem; margin-bottom: 1rem;
+  }
+
+  .prob-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem; font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--cyan); margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .prob-text {
+    font-size: 0.9rem; line-height: 1.65;
+    color: rgba(232,244,255,0.65);
+  }
+
+  /* ── KESSLER ── */
+  #kessler { background: var(--deep); }
+  #kessler-inner { max-width: 1200px; margin: 0 auto; padding: 6rem 2rem; }
+
+  .kessler-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  @media(max-width:768px){ .kessler-layout{ grid-template-columns:1fr; } }
+
+  .cascade-viz {
+    position: relative;
+    height: 400px;
+    border: 1px solid var(--border);
+    background: rgba(5,13,26,0.8);
+    overflow: hidden;
+  }
+
+  #cascade-canvas { width: 100%; height: 100%; display: block; }
+
+  .kessler-stages {
+    display: flex; flex-direction: column; gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .stage {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1.2rem;
+    border-left: 2px solid;
+    background: var(--card-bg);
+  }
+  .stage:nth-child(1) { border-color: var(--muted); }
+  .stage:nth-child(2) { border-color: var(--amber); }
+  .stage:nth-child(3) { border-color: var(--red); }
+
+  .stage-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem; font-weight: 900;
+    min-width: 40px;
+    opacity: 0.4;
+  }
+
+  .stage-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 0.05em; margin-bottom: 0.4rem;
+  }
+
+  .stage-text { font-size: 0.85rem; color: rgba(232,244,255,0.6); line-height: 1.55; }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 3rem; }
+  .timeline::before {
+    content: ''; position: absolute;
+    left: 0; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(to bottom, var(--cyan), rgba(0,212,255,0.1));
+  }
+
+  .tl-item {
+    position: relative; margin-bottom: 2.5rem;
+  }
+  .tl-dot {
+    position: absolute; left: -3rem;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--cyan);
+    top: 0.3rem;
+    transform: translateX(-4px);
+    box-shadow: 0 0 12px var(--cyan);
+  }
+  .tl-dot.red { background: var(--red); box-shadow: 0 0 12px var(--red); }
+  .tl-dot.amber { background: var(--amber); box-shadow: 0 0 12px var(--amber); }
+
+  .tl-year {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem; color: var(--cyan);
+    letter-spacing: 0.15em; margin-bottom: 0.3rem;
+  }
+  .tl-title {
+    font-weight: 500; font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+  .tl-text { font-size: 0.85rem; color: rgba(232,244,255,0.55); line-height: 1.55; }
+
+  /* ── THREAT METER ── */
+  .threat-section {
+    background: rgba(255,60,60,0.04);
+    border: 1px solid rgba(255,60,60,0.15);
+    padding: 2.5rem;
+    margin-top: 3rem;
+  }
+
+  .threat-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .threat-level {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.5rem; font-weight: 900;
+    color: var(--red);
+  }
+
+  .threat-bars { display: flex; flex-direction: column; gap: 1rem; }
+
+  .threat-bar-item { }
+  .bar-label {
+    display: flex; justify-content: space-between;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem; margin-bottom: 0.4rem;
+    color: var(--muted);
+  }
+  .bar-track {
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    position: absolute; left: 0; top: 0;
+    transition: width 1.5s ease;
+  }
+
+  /* ── SOLUTIONS ── */
+  .sol-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .sol-card {
+    padding: 1.8rem;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    position: relative;
+  }
+  .sol-card:hover { border-color: rgba(0,212,255,0.35); }
+
+  .sol-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+  .sol-tag.active { background: rgba(0,212,255,0.1); color: var(--cyan); border: 1px solid rgba(0,212,255,0.3); }
+  .sol-tag.dev { background: rgba(255,165,32,0.1); color: var(--amber); border: 1px solid rgba(255,165,32,0.3); }
+  .sol-tag.concept { background: rgba(90,122,154,0.1); color: var(--muted); border: 1px solid rgba(90,122,154,0.3); }
+
+  .sol-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem; font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.6rem;
+  }
+  .sol-text { font-size: 0.85rem; color: rgba(232,244,255,0.6); line-height: 1.55; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--deep);
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+  .footer-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--cyan); margin-bottom: 0.5rem;
+  }
+  .footer-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem; color: var(--muted);
+    letter-spacing: 0.15em;
+  }
+
+  /* ── COUNTER ANIMATION ── */
+  .counter { display: inline-block; }
+
+  /* Stars bg */
+  .stars-bg {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 999;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent, transparent 2px,
+      rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px
+    );
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">⬡ ORBIT//WATCH</div>
+  <div class="nav-links">
+    <a href="#problem">Проблема</a>
+    <a href="#kessler">Синдром</a>
+    <a href="#history">История</a>
+    <a href="#solutions">Решения</a>
+  </div>
+  <div class="nav-alert">УГРОЗА АКТИВНА</div>
+</nav>
+
+<!-- HERO -->
+<div id="hero">
+  <canvas id="globe-canvas"></canvas>
+
+  <div class="hero-content">
+    <div class="hero-tag">// статус орбиты: критический</div>
+    <h1 class="hero-title">
+      <span class="line1">КОСМИЧЕСКИЙ</span>
+      <span class="line2">МУСОР</span>
+    </h1>
+    <p class="hero-sub">
+      Свыше 27 000 объектов на орбите. Скорость столкновений — 28 000 км/ч.
+      Угроза нарастает с каждым годом.
+    </p>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num counter" data-target="27000">0</span>
+        <span class="stat-label">Объектов &gt;10 см</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num counter" data-target="500000">0</span>
+        <span class="stat-label">Фрагментов &gt;1 см</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num counter" data-target="100000000">0</span>
+        <span class="stat-label">Частиц &gt;1 мм</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>ПРОКРУТИТЬ</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="section-tag">01 / проблема</div>
+  <h2>Орбита под угрозой</h2>
+  <p class="lead">
+    Низкая околоземная орбита (НОО) — от 200 до 2000 км — превращается в свалку
+    промышленных масштабов. Обломки спутников, ступени ракет и инструменты
+    астронавтов несутся со скоростью пули в семь раз быстрее.
+  </p>
+
+  <div class="problem-grid">
+    <div class="prob-card">
+      <div class="prob-icon">🛰</div>
+      <div class="prob-title">Отработанные спутники</div>
+      <p class="prob-text">
+        Тысячи спутников, выработавших ресурс, остаются на орбите десятилетиями.
+        На геостационарной орбите они остаются там навсегда — нет атмосферного торможения.
+      </p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-icon">🚀</div>
+      <div class="prob-title">Ступени ракет</div>
+      <p class="prob-text">
+        Верхние ступени ракет — самые крупные объекты мусора. Они часто взрываются
+        из-за остатков топлива, создавая тысячи новых фрагментов.
+      </p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-icon">💥</div>
+      <div class="prob-title">Испытания ASAT</div>
+      <p class="prob-text">
+        Военные испытания противоспутникового оружия создали огромные облака обломков.
+        Китай в 2007, Индия в 2019, Россия в 2021 году.
+      </p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-icon">⚠️</div>
+      <div class="prob-title">Скорость = энергия</div>
+      <p class="prob-text">
+        Фрагмент 1 см на скорости 7 км/с несёт энергию, эквивалентную гранате.
+        Каждая уклонёнка МКС требует тщательного планирования.
+      </p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-icon">🔭</div>
+      <div class="prob-title">Астрономия страдает</div>
+      <p class="prob-text">
+        Мегасозвездия вроде Starlink засвечивают снимки телескопов.
+        Наземная астрономия под угрозой из-за тысяч ярких полос.
+      </p>
+    </div>
+    <div class="prob-card">
+      <div class="prob-icon">📡</div>
+      <div class="prob-title">GPS и связь</div>
+      <p class="prob-text">
+        Один масштабный каскад столкновений способен уничтожить навигационные
+        спутники, отключив GPS и современную связь по всему миру.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- KESSLER -->
+<div id="kessler">
+<div id="kessler-inner">
+  <div class="section-tag">02 / синдром кесслера</div>
+  <h2>Каскад катастроф</h2>
+  <p class="lead">
+    В 1978 году учёный NASA Дональд Кесслер описал сценарий, при котором
+    столкновения на орбите становятся самоподдерживающимися — каждый обломок
+    порождает новые, делая орбиту непригодной для использования.
+  </p>
+
+  <div class="kessler-layout">
+    <div>
+      <div class="kessler-stages">
+        <div class="stage">
+          <div class="stage-num">01</div>
+          <div>
+            <div class="stage-title" style="color:var(--muted)">Начальное столкновение</div>
+            <p class="stage-text">Два объекта сталкиваются. Даже небольшой фрагмент разрушает
+            спутник, создавая от сотен до тысяч новых обломков.</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="stage-num">02</div>
+          <div>
+            <div class="stage-title" style="color:var(--amber)">Цепная реакция</div>
+            <p class="stage-text">Новые обломки разлетаются по орбите. Плотность мусора
+            растёт, увеличивая вероятность следующего столкновения.</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="stage-num">03</div>
+          <div>
+            <div class="stage-title" style="color:var(--red)">Орбита закрыта</div>
+            <p class="stage-text">Плотность обломков достигает критической массы.
+            Любой запуск обречён. Космическая эра заканчивается на столетия.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cascade-viz">
+      <canvas id="cascade-canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- Threat bars -->
+  <div class="threat-section" style="margin-top:4rem">
+    <div class="threat-header">
+      <div>
+        <div class="section-tag" style="margin-bottom:0.3rem">Уровень угрозы</div>
+        <div class="threat-level">КРИТИЧЕСКИЙ</div>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--muted); text-align:right">
+        <div>Последнее обновление:</div>
+        <div style="color:var(--white)" id="update-time"></div>
+      </div>
+    </div>
+    <div class="threat-bars">
+      <div class="threat-bar-item">
+        <div class="bar-label"><span>НОО (200–2000 км)</span><span style="color:var(--red)">Критично</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--red)" data-width="92%"></div></div>
+      </div>
+      <div class="threat-bar-item">
+        <div class="bar-label"><span>ГСО (35 786 км)</span><span style="color:var(--amber)">Высокий</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--amber)" data-width="71%"></div></div>
+      </div>
+      <div class="threat-bar-item">
+        <div class="bar-label"><span>Средняя орбита (2 000–35 000 км)</span><span style="color:var(--cyan)">Умеренный</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--cyan)" data-width="45%"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- HISTORY -->
+<section id="history">
+  <div class="section-tag">03 / хроника инцидентов</div>
+  <h2>Ключевые события</h2>
+  <p class="lead">С 1957 года орбита Земли стала ареной крупнейших катастроф и инцидентов, определивших сегодняшний кризис.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1957</div>
+      <div class="tl-title">Спутник-1 — начало космической эры</div>
+      <p class="tl-text">Первый искусственный спутник Земли. Орбита была чистой. Это больше не повторится.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot amber"></div>
+      <div class="tl-year">1978</div>
+      <div class="tl-title">Теория Кесслера</div>
+      <p class="tl-text">Дональд Кесслер публикует статью «Частота столкновений искусственных спутников». Мир не обратил внимания.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot red"></div>
+      <div class="tl-year">2007</div>
+      <div class="tl-title">Китай уничтожает Fengyun-1C</div>
+      <p class="tl-text">Испытание ASAT создало более 3000 отслеживаемых обломков на высоте 850 км. Крупнейшее разовое загрязнение орбиты.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot red"></div>
+      <div class="tl-year">2009</div>
+      <div class="tl-title">Iridium-33 × Cosmos-2251</div>
+      <p class="tl-text">Первое случайное столкновение двух спутников. 800 км над Сибирью. Около 2000 новых фрагментов.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot amber"></div>
+      <div class="tl-year">2019</div>
+      <div class="tl-title">Mission Shakti — Индия</div>
+      <p class="tl-text">Испытание противоспутникового оружия на высоте 283 км. Фрагменты угрожали МКС.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot amber"></div>
+      <div class="tl-year">2021</div>
+      <div class="tl-title">Россия уничтожает Космос-1408</div>
+      <p class="tl-text">Испытание ASAT на высоте 480 км. Экипаж МКС эвакуировался в спасательные корабли.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2024</div>
+      <div class="tl-title">Starlink превышает 6000 спутников</div>
+      <p class="tl-text">SpaceX планирует 42 000. Amazon — ещё 3236. Мегасозвездия меняют орбитальную среду навсегда.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTIONS -->
+<section id="solutions">
+  <div class="section-tag">04 / решения</div>
+  <h2>Что можно сделать</h2>
+  <p class="lead">
+    Учёные и инженеры по всему миру разрабатывают технологии для уборки орбиты.
+    Некоторые уже работают. Другие — пока только мечта.
+  </p>
+
+  <div class="sol-grid">
+    <div class="sol-card">
+      <div class="sol-tag active">Активно</div>
+      <div class="sol-title">Правило 25 лет</div>
+      <p class="sol-text">Международное соглашение: спутники НОО должны сходить с орбиты за 25 лет.
+      Соблюдается плохо, но постепенно закрепляется в регуляциях.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-tag active">Активно</div>
+      <div class="sol-title">Манёвры уклонения</div>
+      <p class="sol-text">МКС регулярно меняет орбиту, чтобы избежать опасных объектов.
+      Алгоритмы отслеживания улучшаются с каждым годом.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-tag dev">Разработка</div>
+      <div class="sol-title">ClearSpace-1 (ЕКА)</div>
+      <p class="sol-text">Первый коммерческий «мусорщик»: специальный спутник захватит обломок
+      Vespa с помощью манипуляторов и сведёт с орбиты.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-tag dev">Разработка</div>
+      <div class="sol-title">Гарпун и сеть</div>
+      <p class="sol-card">Проект RemoveDEBRIS: сеть захватывает крупный мусор, гарпун — для меньших
+      объектов. Тест в космосе прошёл успешно в 2018 году.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-tag concept">Концепт</div>
+      <div class="sol-title">Лазерное торможение</div>
+      <p class="sol-text">Мощный лазер с Земли или орбиты испаряет поверхность объекта,
+      создавая тягу. Цена и точность — ещё открытые вопросы.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-tag concept">Концепт</div>
+      <div class="sol-title">Ионный буксир</div>
+      <p class="sol-text">Спутник стыкуется с мусором и использует ионный двигатель для контролируемого
+      схода с орбиты. Подходит для очень крупных объектов.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">ORBIT//WATCH</div>
+  <p class="footer-sub">Данные: NASA, ESA, NOAA · Последнее обновление: 2025</p>
+  <p style="margin-top:1rem;font-size:0.8rem;color:rgba(90,122,154,0.5)">
+    Орбита принадлежит всем. Беречь её — долг каждого.
+  </p>
+</footer>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+// ───────────────────────────────────────────
+// GLOBE (Three.js)
+// ───────────────────────────────────────────
+(function initGlobe() {
+  const canvas = document.getElementById('globe-canvas');
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setSize(W, H);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
+  camera.position.set(0, 0, 3.2);
+
+  // Stars
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 3000;
+  const starPos = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount * 3; i++) {
+    starPos[i] = (Math.random() - 0.5) * 200;
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.12, transparent: true, opacity: 0.6 });
+  scene.add(new THREE.Points(starGeo, starMat));
+
+  // Earth sphere
+  const earthGeo = new THREE.SphereGeometry(1, 64, 64);
+
+  // Procedural grid texture
+  const texCanvas = document.createElement('canvas');
+  texCanvas.width = 1024; texCanvas.height = 512;
+  const ctx = texCanvas.getContext('2d');
+
+  // Ocean
+  ctx.fillStyle = '#041830';
+  ctx.fillRect(0, 0, 1024, 512);
+
+  // Grid lines (latitude/longitude)
+  ctx.strokeStyle = 'rgba(0,100,180,0.25)';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 18; i++) {
+    const y = (i / 18) * 512;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1024, y); ctx.stroke();
+  }
+  for (let i = 0; i <= 36; i++) {
+    const x = (i / 36) * 1024;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke();
+  }
+
+  // Glow dots for cities / poles
+  const dots = [
+    [0.14,0.35],[0.5,0.28],[0.55,0.4],[0.75,0.45],[0.2,0.4],[0.3,0.6],[0.6,0.3]
+  ];
+  dots.forEach(([u,v]) => {
+    const grd = ctx.createRadialGradient(u*1024, v*512, 0, u*1024, v*512, 8);
+    grd.addColorStop(0,'rgba(0,212,255,0.9)');
+    grd.addColorStop(1,'rgba(0,212,255,0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(u*1024, v*512, 8, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  const earthTex = new THREE.CanvasTexture(texCanvas);
+  const earthMat = new THREE.MeshPhongMaterial({
+    map: earthTex,
+    emissive: new THREE.Color(0x001a33),
+    emissiveIntensity: 0.3,
+    shininess: 80,
+  });
+  const earth = new THREE.Mesh(earthGeo, earthMat);
+  scene.add(earth);
+
+  // Atmosphere glow
+  const atmoGeo = new THREE.SphereGeometry(1.06, 32, 32);
+  const atmoMat = new THREE.MeshPhongMaterial({
+    color: 0x0055ff,
+    transparent: true,
+    opacity: 0.1,
+    side: THREE.BackSide
+  });
+  scene.add(new THREE.Mesh(atmoGeo, atmoMat));
+
+  // Debris rings
+  function makeDebrisRing(radius, count, color, size) {
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const r = radius + (Math.random() - 0.5) * 0.12;
+      const tilt = (Math.random() - 0.5) * 0.5;
+      positions[i*3] = Math.cos(angle) * r;
+      positions[i*3+1] = tilt;
+      positions[i*3+2] = Math.sin(angle) * r;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const mat = new THREE.PointsMaterial({ color, size, transparent: true, opacity: 0.7 });
+    return new THREE.Points(geo, mat);
+  }
+
+  const debris1 = makeDebrisRing(1.25, 400, 0xff3c3c, 0.018);
+  const debris2 = makeDebrisRing(1.45, 250, 0xffa520, 0.014);
+  const debris3 = makeDebrisRing(1.7, 150, 0x00d4ff, 0.010);
+  scene.add(debris1, debris2, debris3);
+
+  // Lights
+  const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+  sun.position.set(5, 3, 5);
+  scene.add(sun);
+  scene.add(new THREE.AmbientLight(0x0a1a2a, 0.8));
+
+  // Orbit rings (visual)
+  function makeOrbitRing(radius, color) {
+    const geo = new THREE.TorusGeometry(radius, 0.002, 4, 128);
+    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.15 });
+    return new THREE.Mesh(geo, mat);
+  }
+  const ring1 = makeOrbitRing(1.25, 0xff3c3c);
+  const ring2 = makeOrbitRing(1.45, 0xffa520);
+  ring1.rotation.x = 0.3; ring2.rotation.x = -0.2;
+  scene.add(ring1, ring2);
+
+  // Mouse interaction
+  let mx = 0, my = 0;
+  document.addEventListener('mousemove', e => {
+    mx = (e.clientX / window.innerWidth - 0.5) * 0.3;
+    my = (e.clientY / window.innerHeight - 0.5) * 0.15;
+  });
+
+  let frame = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    frame++;
+    earth.rotation.y += 0.0015;
+    debris1.rotation.y += 0.003;
+    debris2.rotation.y -= 0.002;
+    debris3.rotation.y += 0.001;
+    ring1.rotation.z += 0.0005;
+
+    camera.position.x += (mx - camera.position.x) * 0.03;
+    camera.position.y += (-my - camera.position.y) * 0.03;
+    camera.lookAt(0, 0, 0);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    const w = canvas.offsetWidth, h = canvas.offsetHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
+})();
+
+// ───────────────────────────────────────────
+// CASCADE CANVAS (2D simulation)
+// ───────────────────────────────────────────
+(function initCascade() {
+  const canvas = document.getElementById('cascade-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+
+  const W = canvas.width, H = canvas.height;
+  let particles = [];
+  let phase = 0; // 0=sparse, 1=collision, 2=cascade
+
+  function spawnParticle(x, y, vx, vy, r, color, life) {
+    particles.push({ x, y, vx, vy, r, color, life, maxLife: life, trail: [] });
+  }
+
+  // Initial sparse debris
+  for (let i = 0; i < 12; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 0.4 + Math.random() * 0.3;
+    spawnParticle(
+      W/2 + Math.cos(angle) * (60 + Math.random()*60),
+      H/2 + Math.sin(angle) * (30 + Math.random()*30),
+      Math.sin(angle) * speed,
+      -Math.cos(angle) * speed,
+      2 + Math.random()*2,
+      '#00d4ff',
+      9999
+    );
+  }
+
+  let collisionTimer = 0;
+  let cascadePhase = false;
+
+  function tick() {
+    ctx.fillStyle = 'rgba(5,13,26,0.3)';
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw Earth circle
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 50, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(0,100,180,0.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(4,24,48,0.8)';
+    ctx.fill();
+
+    // Orbit rings
+    [70,90,115].forEach((r, i) => {
+      ctx.beginPath();
+      ctx.arc(W/2, H/2, r, 0, Math.PI*2);
+      ctx.strokeStyle = ['rgba(255,60,60,0.1)','rgba(255,165,32,0.1)','rgba(0,212,255,0.1)'][i];
+      ctx.stroke();
+    });
+
+    collisionTimer++;
+
+    // Trigger collision event
+    if (collisionTimer === 180 && !cascadePhase) {
+      cascadePhase = true;
+      // Big flash
+      const p1 = particles[Math.floor(particles.length/2)];
+      for (let i = 0; i < 20; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 0.5 + Math.random() * 1.5;
+        spawnParticle(p1.x, p1.y, Math.cos(ang)*spd, Math.sin(ang)*spd, 1+Math.random()*2, '#ff3c3c', 200 + Math.random()*200);
+      }
+    }
+
+    // Cascade spawning
+    if (cascadePhase && collisionTimer % 30 === 0 && particles.length < 200) {
+      for (let i = 0; i < 5; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 65 + Math.random() * 60;
+        const speed = 0.3 + Math.random() * 0.7;
+        spawnParticle(
+          W/2 + Math.cos(angle) * dist,
+          H/2 + Math.sin(angle) * dist * 0.5,
+          Math.sin(angle) * speed,
+          -Math.cos(angle) * speed,
+          1, '#ffa520', 300 + Math.random()*400
+        );
+      }
+    }
+
+    // Update & draw particles
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => {
+      // Orbit around center
+      const dx = W/2 - p.x, dy = H/2 - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist > 10) {
+        const grav = 0.003;
+        p.vx += dx/dist * grav;
+        p.vy += dy/dist * grav;
+      }
+
+      p.trail.push({x:p.x, y:p.y});
+      if (p.trail.length > 8) p.trail.shift();
+
+      p.x += p.vx; p.y += p.vy;
+      p.life--;
+
+      const alpha = p.life < 50 ? p.life/50 : 1;
+
+      // Trail
+      if (p.trail.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(p.trail[0].x, p.trail[0].y);
+        p.trail.forEach(t => ctx.lineTo(t.x, t.y));
+        ctx.strokeStyle = p.color.replace(')', `,${alpha*0.3})`).replace('rgb','rgba');
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+
+      // Dot
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = alpha;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+
+    // Label
+    const label = cascadePhase ? '⚠ КАСКАД КЕССЛЕРА' : 'НАЧАЛЬНОЕ СОСТОЯНИЕ';
+    const col = cascadePhase ? '#ff3c3c' : '#00d4ff';
+    ctx.font = '10px "Share Tech Mono", monospace';
+    ctx.fillStyle = col;
+    ctx.fillText(label, 12, H - 12);
+    ctx.fillStyle = 'rgba(90,122,154,0.6)';
+    ctx.fillText(`Объектов: ${particles.length}`, W - 90, H - 12);
+
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+// ───────────────────────────────────────────
+// COUNTERS
+// ───────────────────────────────────────────
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target);
+  const dur = 2000;
+  const start = performance.now();
+  function step(now) {
+    const t = Math.min((now - start) / dur, 1);
+    const eased = 1 - Math.pow(1-t, 3);
+    const val = Math.floor(eased * target);
+    el.textContent = val >= 1000000 ? (val/1000000).toFixed(0)+'M+' :
+                     val >= 1000 ? (val/1000).toFixed(0)+'K+' : val;
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { animateCounter(e.target); io.unobserve(e.target); }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.counter').forEach(el => io.observe(el));
+
+// ───────────────────────────────────────────
+// THREAT BARS
+// ───────────────────────────────────────────
+const barObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.bar-fill').forEach(bar => {
+        bar.style.width = bar.dataset.width;
+      });
+      barObs.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+const threatEl = document.querySelector('.threat-section');
+if (threatEl) barObs.observe(threatEl);
+
+// ───────────────────────────────────────────
+// LIVE TIME
+// ───────────────────────────────────────────
+function updateTime() {
+  const el = document.getElementById('update-time');
+  if (el) el.textContent = new Date().toLocaleString('ru-RU');
+}
+updateTime();
+setInterval(updateTime, 1000);
+</script>
+
+</body>
+</html>
