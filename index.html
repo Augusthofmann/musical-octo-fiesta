@@ -427,6 +427,18 @@
             color: rgba(232, 244, 255, 0.6);
             line-height: 1.55;
         }
+        
+        #connections {
+            position: relative;
+        }
+        
+        #connections::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(0, 212, 255, 0.05), transparent 40%);
+            pointer-events: none;
+        }
         /* ── TIMELINE ── */
         
         .timeline {
@@ -661,6 +673,7 @@
         <div class="nav-links">
             <a href="#problem">Проблема</a>
             <a href="#kessler">Синдром</a>
+            <a href="#connections">Взаимосвязи</a>
             <a href="#history">История</a>
             <a href="#solutions">Решения</a>
             <a href="#sources">Источники</a>
@@ -884,6 +897,93 @@
                 <div class="tl-title">Starlink превышает 6000 спутников</div>
                 <p class="tl-text">SpaceX планирует 42 000. Amazon — ещё 3236. Мегасозвездия меняют орбитальную среду навсегда.</p>
             </div>
+        </div>
+    </section>
+
+    <!-- CONNECTIONS -->
+    <section id="connections">
+        <div class="section-tag">02.5 / взаимосвязи</div>
+
+        <h2>Связь с глобальными проблемами</h2>
+
+        <p class="lead">
+            Космический мусор влияет не только на орбиту Земли. Он связан с экономикой, безопасностью, климатическими исследованиями, а также будущим всей космической индустрии.
+        </p>
+
+        <div class="problem-grid">
+
+            <div class="prob-card">
+                <div class="prob-icon">🌍</div>
+
+                <div class="prob-title">
+                    Климат и экология
+                </div>
+
+                <p class="prob-text">
+                    Климатические спутники отслеживают температуру океанов, лесные пожары, уровень CO₂ и таяние ледников. Потеря таких аппаратов ухудшит мониторинг изменения климата и прогнозирование природных катастроф.
+                </p>
+            </div>
+
+            <div class="prob-card">
+                <div class="prob-icon">💰</div>
+
+                <div class="prob-title">
+                    Экономика и инфраструктура
+                </div>
+
+                <p class="prob-text">
+                    GPS, банковские операции, логистика, интернет и авиация зависят от спутников. Масштабный каскад столкновений способен вызвать серьёзные сбои в мировой инфраструктуре.
+                </p>
+            </div>
+
+            <div class="prob-card">
+                <div class="prob-icon">🛰</div>
+
+                <div class="prob-title">
+                    Наука и астрономия
+                </div>
+
+                <p class="prob-text">
+                    Обломки и мегасозвездия спутников мешают работе телескопов, засвечивают снимки неба и угрожают научным миссиям, изучающим Вселенную.
+                </p>
+            </div>
+
+            <div class="prob-card">
+                <div class="prob-icon">⚔️</div>
+
+                <div class="prob-title">
+                    Военные конфликты
+                </div>
+
+                <p class="prob-text">
+                    Испытания противоспутникового оружия создают тысячи новых обломков. Милитаризация космоса усиливает риск превращения орбиты в опасную зону постоянных столкновений.
+                </p>
+            </div>
+
+            <div class="prob-card">
+                <div class="prob-icon">🚀</div>
+
+                <div class="prob-title">
+                    Освоение космоса
+                </div>
+
+                <p class="prob-text">
+                    Рост количества мусора делает запуски сложнее и дороже. В будущем это может замедлить программы освоения Луны, Марса и развитие новых космических технологий.
+                </p>
+            </div>
+
+            <div class="prob-card">
+                <div class="prob-icon">🌐</div>
+
+                <div class="prob-title">
+                    Зависимость человечества
+                </div>
+
+                <p class="prob-text">
+                    Современная цивилизация всё сильнее зависит от спутниковых систем. Космос стал частью глобальной инфраструктуры, без которой невозможно представить современный мир.
+                </p>
+            </div>
+
         </div>
     </section>
 
