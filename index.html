@@ -1218,16 +1218,27 @@
 
             // Debris rings
             function makeDebrisRing(radius, count, color, size) {
-                const geo = new THREE.BufferGeometry();
-                const positions = new Float32Array(count * 3);
-                for (let i = 0; i < count; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const r = radius + (Math.random() - 0.5) * 0.12;
-                    const tilt = (Math.random() - 0.5) * 0.5;
-                    positions[i * 3] = Math.cos(angle) * r;
-                    positions[i * 3 + 1] = tilt;
-                    positions[i * 3 + 2] = Math.sin(angle) * r;
-                }
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+        // Равномерное распределение по всей сфере
+        const theta = Math.random() * Math.PI * 2;          // долгота
+        const phi = Math.acos(2 * Math.random() - 1);       // широта (равномерная!)
+        const r = radius + (Math.random() - 0.5) * 0.12;   // небольшой разброс по радиусу
+        
+        positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = r * Math.cos(phi);
+        positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const mat = new THREE.PointsMaterial({
+        color,
+        size,
+        transparent: true,
+        opacity: 0.7
+    });
+    return new THREE.Points(geo, mat);
+}
                 geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
                 const mat = new THREE.PointsMaterial({
                     color,
